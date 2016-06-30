@@ -1,0 +1,175 @@
+﻿<controls:MetroWindow x:Class="PropertyBuilder.View.MainWindow"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+                      xmlns:controls1="clr-namespace:PropertyBuilder.Controls"
+                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                      xmlns:viewModel="clr-namespace:PropertyBuilder.ViewModel"
+                      xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+                      Title="Property Builder"
+                      Width="1100"
+                      Height="700"
+                      MinWidth="950"
+                      MinHeight="400"
+                      GlowBrush="{StaticResource AccentColorBrush}"
+                      WindowStartupLocation="CenterScreen"
+                      WindowState="Maximized"
+                      mc:Ignorable="d">
+    <controls:MetroWindow.DataContext>
+        <viewModel:MainWindowViewModel />
+    </controls:MetroWindow.DataContext>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="350" />
+        </Grid.ColumnDefinitions>
+
+        <Expander Grid.Row="0"
+                  Grid.Column="0"
+                  Margin="5,5,0,0"
+                  Header="Default Properties"
+                  IsExpanded="True">
+            <Grid>
+                <TextBlock Height="Auto"
+                           Margin="10,15,0,0"
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Top"
+                           Text="Type: " />
+                <ComboBox Width="265"
+                          Margin="46,10,0,0"
+                          HorizontalAlignment="Left"
+                          VerticalAlignment="Top"
+                          ItemsSource="{Binding DefaultType.PrimitiveTypes}"
+                          SelectedItem="{Binding DefaultType.SelectedType,
+                                                 Mode=TwoWay,
+                                                 UpdateSourceTrigger=PropertyChanged}" />
+
+                <CheckBox x:Name="isCollection"
+                          Height="Auto"
+                          Margin="316,15,0,0"
+                          HorizontalAlignment="Left"
+                          VerticalAlignment="Top"
+                          Content="Is Collection?"
+                          IsChecked="{Binding DefaultType.IsCollection,
+                                              Mode=TwoWay,
+                                              UpdateSourceTrigger=PropertyChanged}" />
+                <ComboBox Margin="415,10,10,0"
+                          VerticalAlignment="Top"
+                          IsEnabled="{Binding IsChecked,
+                                              ElementName=isCollection}"
+                          ItemsSource="{Binding DefaultType.GenericCollections}"
+                          SelectedItem="{Binding DefaultType.SelectedCollectionType,
+                                                 Mode=TwoWay,
+                                                 UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock Height="Auto"
+                           Margin="10,46,0,0"
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Top"
+                           Text="Access Modifier: " />
+                <ComboBox Width="197"
+                          Margin="114,41,0,0"
+                          HorizontalAlignment="Left"
+                          VerticalAlignment="Top"
+                          ItemsSource="{Binding DefaultType.AccessModifiers}"
+                          SelectedItem="{Binding DefaultType.SelectedAccessModifier,
+                                                 Mode=TwoWay,
+                                                 UpdateSourceTrigger=PropertyChanged}" />
+                <CheckBox x:Name="withBackingField"
+                          Height="Auto"
+                          Margin="316,45,0,0"
+                          HorizontalAlignment="Left"
+                          VerticalAlignment="Top"
+                          Content="With Backing Field?"
+                          IsChecked="{Binding DefaultType.WithBackingField,
+                                              Mode=TwoWay,
+                                              UpdateSourceTrigger=PropertyChanged}" />
+                <TextBox Width="50"
+                         Margin="448,41,0,0"
+                         HorizontalAlignment="Left"
+                         VerticalAlignment="Top"
+                         controls:TextBoxHelper.Watermark="_prefix"
+                         IsEnabled="{Binding IsChecked,
+                                             ElementName=withBackingField}"
+                         MaxLength="5"
+                         Text="{Binding DefaultType.BackingFieldPrefix}" />
+                <CheckBox x:Name="isINotify"
+                          Height="Auto"
+                          Margin="10,75,0,0"
+                          HorizontalAlignment="Left"
+                          VerticalAlignment="Top"
+                          Content="INotifyPropertyChanged?"
+                          IsChecked="{Binding DefaultType.WithNotifier,
+                                              Mode=TwoWay,
+                                              UpdateSourceTrigger=PropertyChanged}"
+                          IsEnabled="{Binding IsChecked,
+                                              ElementName=withBackingField}" />
+                <TextBox Margin="173,72,173,0"
+                         VerticalAlignment="Top"
+                         controls:TextBoxHelper.Watermark="OnPropertyChanged"
+                         IsEnabled="{Binding IsChecked,
+                                             ElementName=isINotify}"
+                         Text="{Binding DefaultType.NotifyMethodName,
+                                        Mode=TwoWay,
+                                        UpdateSourceTrigger=PropertyChanged}" />
+
+                <Button Width="56"
+                        Margin="0,72,10,0"
+                        HorizontalAlignment="Right"
+                        Command="{Binding ClearDefaultSettingsCommand}"
+                        Content="Clear"
+                        Style="{StaticResource MetroAccentButton}" />
+            </Grid>
+        </Expander>
+
+        <GroupBox Grid.Row="0"
+                  Grid.RowSpan="4"
+                  Grid.Column="1"
+                  Header="Result">
+            <xctk:RichTextBox IsReadOnly="True"
+                              Text="{Binding ResultText,
+                                             Mode=OneWay,
+                                             UpdateSourceTrigger=PropertyChanged}"
+                              VerticalScrollBarVisibility="Auto">
+                <xctk:RichTextBox.TextFormatter>
+                    <xctk:PlainTextFormatter />
+                </xctk:RichTextBox.TextFormatter>
+            </xctk:RichTextBox>
+        </GroupBox>
+
+        <GroupBox Grid.Row="1"
+                  Grid.RowSpan="3"
+                  Grid.Column="0"
+                  Margin="5,5,65,5"
+                  Header="Properties">
+            <controls1:PropertyTagsBox ItemsSource="{Binding Properties,
+                                                             Mode=TwoWay,
+                                                             UpdateSourceTrigger=PropertyChanged}"
+                                       KeyboardNavigation.TabNavigation="Continue"
+                                       Style="{StaticResource PropertyTagListBoxStyle}" />
+        </GroupBox>
+
+        <Button Grid.Row="2"
+                Grid.Column="0"
+                Width="60"
+                Height="60"
+                Margin="0"
+                HorizontalAlignment="Right"
+                BorderBrush="{StaticResource AccentColorBrush}"
+                Command="{Binding GeneratePropertiesCommand}"
+                Style="{StaticResource MetroCircleButtonStyle}">
+            <Viewbox Width="40" Height="40">
+                <Canvas Width="24" Height="24">
+                    <Path Data="M5.59,7.41L7,6L13,12L7,18L5.59,16.59L10.17,12L5.59,7.41M11.59,7.41L13,6L19,12L13,18L11.59,16.59L16.17,12L11.59,7.41Z" Fill="{StaticResource AccentColorBrush}" />
+                </Canvas>
+            </Viewbox>
+        </Button>
+
+    </Grid>
+</controls:MetroWindow>
